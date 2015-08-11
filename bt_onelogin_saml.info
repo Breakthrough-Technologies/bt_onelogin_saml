@@ -1,0 +1,8 @@
+name = BT Onelogin Saml
+description = Uses Onelogin's php-saml toolkit to autenticate against an SSO solution.
+core = 7.x
+package = Breakthrough
+configure = admin/config/system/onelogin_saml
+
+dependencies[] = libraries
+dependencies[] = email_registration
