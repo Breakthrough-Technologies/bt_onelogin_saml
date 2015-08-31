@@ -92,6 +92,7 @@ function saml_provision($mail) {
     'mail' => $mail,
     'init' => $mail,
     'pass' => user_password(),
+    'timezone' => variable_get('date_default_timezone'),
     'status' => TRUE,
   );
   $data['roles'][DRUPAL_AUTHENTICATED_RID] = 'authenticated user';
@@ -109,18 +110,21 @@ function saml_provision($mail) {
  * Logs out of SSO, then redirects to the SP settings for the single logout
  * service url (usually user/logout).
  *
+ * @param NULL|string $session_index
+ *   The SAML session index stored in $_SESSION, or NULL to find it.
+ *
  * @throws OneLogin_Saml2_Error
  */
-function saml_toolkit_sls() {
+function saml_toolkit_sls($session_index = NULL) {
   // Kill SSO session.
   $auth = bt_onelogin_saml_get_instance();
   $return_to = NULL;
   $parameters = array();
   $name_id = isset($_SESSION['samlNameId']) ? $_SESSION['samlNameId'] : NULL;
-  $session_index = isset($_SESSION['samlSessionIndex']) ?
-    $_SESSION['samlSessionIndex'] : NULL;
+  $session_index = $session_index ? $session_index :
+    (isset($_SESSION['samlSessionIndex']) ? $_SESSION['samlSessionIndex'] :
+      NULL);
   $auth->logout($return_to, $parameters, $name_id, $session_index);
-
 }
 
 /**

@@ -73,6 +73,13 @@ function bt_onelogin_saml_menu() {
 }
 
 /**
+ * Implements hook_menu_alter().
+ */
+function bt_onelogin_saml_menu_alter(&$items) {
+  $items['user/logout']['page callback'] = 'saml_user_logout';
+}
+
+/**
  * Implements hook_permission().
  */
 function bt_onelogin_saml_permission() {
@@ -206,4 +213,33 @@ function bt_onelogin_saml_get_metadata(&$errors = array()) {
  */
 function saml_metadata_access() {
   return variable_get('bt_onelogin_saml_anon_metadata', user_access('administer onelogin saml'));
+}
+
+function saml_user_logout() {
+  $session_index = isset($_SESSION['samlSessionIndex']) ?
+    $_SESSION['samlSessionIndex'] : NULL;
+
+  if ($session_index) {
+    // Check for a response from IdP.
+    $saml_response = NULL;
+    if (array_key_exists('SAMLResponse', $_REQUEST)) {
+      $saml_response = $_REQUEST['SAMLResponse'];
+    }
+    if (!$saml_response && array_key_exists('SAMLResponse', $_POST)) {
+      $saml_response = $_POST['SAMLResponse'];
+    }
+
+    if ($saml_response) {
+      // SLO request may have passed or failed on IdP, but we still log the user
+      // out.
+      user_logout();
+    }
+    else {
+      module_load_include('inc', 'bt_onelogin_saml', 'bt_onelogin_saml.services');
+      saml_toolkit_sls($session_index);
+    }
+  }
+  else {
+    user_logout();
+  }
 }

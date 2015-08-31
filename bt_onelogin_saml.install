@@ -29,3 +29,21 @@ function bt_onelogin_saml_requirements($phase) {
   }
   return $requirements;
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function bt_onelogin_saml_uninstall() {
+  variable_del('bt_onelogin_saml_anon_metadata');
+  variable_del('bt_onelogin_saml_sp_entityid');
+  variable_del('bt_onelogin_saml_sp_acs_url');
+  variable_del('bt_onelogin_saml_sp_sls_url');
+  variable_del('bt_onelogin_saml_sp_nameidformat');
+  variable_del('bt_onelogin_saml_sp_mail_attribute');
+  variable_del('bt_onelogin_saml_sp_x509cert');
+  variable_del('bt_onelogin_saml_idp_entityid');
+  variable_del('bt_onelogin_saml_idp_sso_url');
+  variable_del('bt_onelogin_saml_idp_sls_url');
+  variable_del('bt_onelogin_saml_idp_x509cert');
+  variable_del('bt_onelogin_saml_autoprovision');
+}
