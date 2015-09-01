@@ -190,17 +190,22 @@ function bt_onelogin_saml_get_instance() {
  *
  * @return string
  *   The metadata xml.
- * @throws OneLogin_Saml2_Error
  */
 function bt_onelogin_saml_get_metadata(&$errors = array()) {
   $metadata = '';
   $library = libraries_load('php-saml');
   if ($library && !empty($library['loaded'])) {
-    $settings = new OneLogin_Saml2_Settings(bt_onelogin_saml_get_settings(), TRUE);
-    $metadata = $settings->getSPMetadata();
-    foreach ($settings->validateMetadata($metadata) as $error) {
-      $errors[] = $error;
+    try {
+      $settings = new OneLogin_Saml2_Settings(bt_onelogin_saml_get_settings(), TRUE);
+      $metadata = $settings->getSPMetadata();
+      foreach ($settings->validateMetadata($metadata) as $error) {
+        $errors[] = $error;
+      }
     }
+    catch (\Exception $e) {
+      // Eat it.
+    }
+
   }
   return $metadata;
 }
@@ -215,6 +220,9 @@ function saml_metadata_access() {
   return variable_get('bt_onelogin_saml_anon_metadata', user_access('administer onelogin saml'));
 }
 
+/**
+ * Page callback for user logout in SAML and Drupal.
+ */
 function saml_user_logout() {
   $session_index = isset($_SESSION['samlSessionIndex']) ?
     $_SESSION['samlSessionIndex'] : NULL;

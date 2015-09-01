@@ -10,7 +10,6 @@
 function bt_onelogin_saml_requirements($phase) {
   $requirements = array();
   switch ($phase) {
-    case 'install':
     case 'runtime':
       $t = get_t();
       $toolkit_detected = libraries_detect('php-saml');

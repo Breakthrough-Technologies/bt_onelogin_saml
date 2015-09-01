@@ -48,7 +48,7 @@ function saml_toolkit_acs() {
 
   // Other create user is autoprovision setting enabled.
   elseif (variable_get('bt_onelogin_saml_autoprovision', FALSE)) {
-    $user = saml_provision($mail);
+    $user = saml_provision($mail, $user_data);
     saml_authenticate($user);
   }
 
@@ -77,12 +77,14 @@ function saml_authenticate($user) {
  *
  * @param string $mail
  *   Email address of the user.
+ * @param array $user_data
+ *   SSO user attributes.
  *
  * @return object
  *   Drupal user object.
  * @throws Exception
  */
-function saml_provision($mail) {
+function saml_provision($mail, $user_data) {
   // Create the user entity. This module requires email_registration which
   // will find the email_registration_ prefix during the user creation hooks
   // and create a unique username based on email.
@@ -97,10 +99,11 @@ function saml_provision($mail) {
   );
   $data['roles'][DRUPAL_AUTHENTICATED_RID] = 'authenticated user';
 
-  module_invoke_all('bt_onelogin_saml_pre_provision_user');
+  // Give modules the chance to alter users data before save.
+  drupal_alter('bt_onelogin_saml_pre_provision_user', $data, $user_data);
   $account = entity_create('user', array());
   user_save($account, $data);
-  module_invoke_all('bt_onelogin_saml_post_provision_user');
+  drupal_alter('bt_onelogin_saml_post_provision_user', $account, $user_data);
   return $account;
 }
 

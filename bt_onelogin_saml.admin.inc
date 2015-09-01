@@ -27,8 +27,11 @@ function saml_toolkit_settings($form, &$form_state) {
     '#title' => t('Allow anonymous access to SAML Metadata XML.'),
     '#default_value' => variable_get('bt_onelogin_saml_anon_metadata', FALSE),
   );
+
+  $metadata = bt_onelogin_saml_get_metadata();
   $form['sp']['metadata'][] = array(
     '#type' => 'fieldset',
+    '#access' => $metadata != '',
     '#title' => t('View SAML Metadata XML'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
@@ -36,7 +39,7 @@ function saml_toolkit_settings($form, &$form_state) {
       '#type' => 'textarea',
       '#title' => t('Metadata'),
       '#disabled' => 'disabled',
-      '#default_value' => bt_onelogin_saml_get_metadata(),
+      '#default_value' => $metadata,
       '#suffix' => l(t('Open SAML Metadata XML in new window'),
         'onelogin_saml/metadata', array(
           'attributes' => array(
