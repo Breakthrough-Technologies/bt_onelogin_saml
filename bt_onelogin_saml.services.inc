@@ -108,7 +108,7 @@ function saml_provision($mail, $user_data) {
 }
 
 /**
- * Page callback for single logout service.
+ * Processes logout initiated by SP.
  *
  * Logs out of SSO, then redirects to the SP settings for the single logout
  * service url (usually user/logout).
@@ -118,7 +118,7 @@ function saml_provision($mail, $user_data) {
  *
  * @throws OneLogin_Saml2_Error
  */
-function saml_toolkit_sls($session_index = NULL) {
+function saml_toolkit_sls_sp($session_index = NULL) {
   // Kill SSO session.
   $auth = bt_onelogin_saml_get_instance();
   $return_to = NULL;
@@ -128,6 +128,16 @@ function saml_toolkit_sls($session_index = NULL) {
     (isset($_SESSION['samlSessionIndex']) ? $_SESSION['samlSessionIndex'] :
       NULL);
   $auth->logout($return_to, $parameters, $name_id, $session_index);
+}
+
+/**
+ * Processes logout initiated by IdP.
+ *
+ * @throws OneLogin_Saml2_Error
+ */
+function saml_toolkit_sls_idp() {
+  $auth = bt_onelogin_saml_get_instance();
+  $auth->processSLO();
 }
 
 /**

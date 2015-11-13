@@ -56,12 +56,6 @@ function bt_onelogin_saml_menu() {
     'access callback' => 'user_is_anonymous',
     'file' => 'bt_onelogin_saml.services.inc',
   );
-  $items['onelogin_saml/sls'] = array(
-    'title' => 'Onelogin SAML single logout service',
-    'page callback' => 'saml_toolkit_sls',
-    'access callback' => 'user_is_logged_in',
-    'file' => 'bt_onelogin_saml.services.inc',
-  );
   $items['onelogin_saml/sso'] = array(
     'title' => 'Onelogin SAML single sign on service',
     'page callback' => 'saml_toolkit_sso',
@@ -228,6 +222,12 @@ function saml_user_logout() {
     $_SESSION['samlSessionIndex'] : NULL;
 
   if ($session_index) {
+    // Check for SAMLRequest indicating logout request coming from IdP.
+    if (array_key_exists('SAMLRequest', $_REQUEST)) {
+      module_load_include('inc', 'bt_onelogin_saml', 'bt_onelogin_saml.services');
+      return saml_toolkit_sls_idp();
+    }
+
     // Check for a response from IdP.
     $saml_response = NULL;
     if (array_key_exists('SAMLResponse', $_REQUEST)) {
@@ -244,7 +244,7 @@ function saml_user_logout() {
     }
     else {
       module_load_include('inc', 'bt_onelogin_saml', 'bt_onelogin_saml.services');
-      saml_toolkit_sls($session_index);
+      saml_toolkit_sls_sp($session_index);
     }
   }
   else {
