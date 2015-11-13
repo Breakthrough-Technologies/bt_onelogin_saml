@@ -22,32 +22,32 @@ function saml_toolkit_settings($form, &$form_state) {
     '#title' => t('Service Provider'),
   );
 
-  $form['sp']['metadata']['bt_onelogin_saml_anon_metadata'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Allow anonymous access to SAML Metadata XML.'),
-    '#default_value' => variable_get('bt_onelogin_saml_anon_metadata', FALSE),
-  );
-
   $metadata = bt_onelogin_saml_get_metadata();
-  $form['sp']['metadata'][] = array(
-    '#type' => 'fieldset',
-    '#access' => $metadata != '',
-    '#title' => t('View SAML Metadata XML'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-    'metadata' => array(
-      '#type' => 'textarea',
-      '#title' => t('Metadata'),
-      '#disabled' => 'disabled',
-      '#default_value' => $metadata,
-      '#suffix' => l(t('Open SAML Metadata XML in new window'),
-        'onelogin_saml/metadata', array(
-          'attributes' => array(
-            'target' => '_blank',
-          ),
-        )),
-    ),
-  );
+  if ($metadata != '') {
+    $form['sp']['metadata']['bt_onelogin_saml_anon_metadata'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Allow anonymous access to SAML Metadata XML.'),
+      '#default_value' => variable_get('bt_onelogin_saml_anon_metadata', FALSE),
+    );
+    $form['sp']['metadata'][] = array(
+      '#type' => 'fieldset',
+      '#title' => t('View SAML Metadata XML'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      'metadata' => array(
+        '#type' => 'textarea',
+        '#title' => t('Metadata'),
+        '#disabled' => 'disabled',
+        '#default_value' => $metadata,
+        '#suffix' => l(t('Open SAML Metadata XML in new window'),
+          'onelogin_saml/metadata', array(
+            'attributes' => array(
+              'target' => '_blank',
+            ),
+          )),
+      ),
+    );
+  }
 
   $form['sp']['bt_onelogin_saml_sp_entityid'] = array(
     '#type' => 'textfield',
